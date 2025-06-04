@@ -86,6 +86,8 @@ def get_category_word(category):
     if not available:
         used_words[category] = []
         available = categories[category][:]
+    if not available:
+        return None
     word = random.choice(available)
     used_words[category].append(word)
     save_json(used_words_file, used_words)
@@ -113,6 +115,9 @@ def startgame(update: Update, context: CallbackContext):
     update.message.reply_text("Bitte gib eine Kategorie ein (z.B. tiere, essen, spicy, arbeit, gegenstände, hobbies, alles):")
     context.bot_data['awaiting'] = 'category'
 
+def kategorien(update: Update, context: CallbackContext):
+    update.message.reply_text("📚 Verfügbare Kategorien:\n" + ", ".join(categories.keys()))
+
 def handle_all_messages(update: Update, context: CallbackContext):
     text = update.message.text.strip().lower()
     user_id = update.effective_user.id
@@ -121,11 +126,18 @@ def handle_all_messages(update: Update, context: CallbackContext):
 
     # Kategorieeingabe
     if awaiting == 'category':
+        print(f"[Kategorie gewählt] {text}")
         if text not in categories:
             update.message.reply_text("❌ Unbekannte Kategorie. Versuch es erneut.")
             return
+        if not categories[text]:
+            update.message.reply_text("⚠️ Diese Kategorie ist leer. Bitte andere wählen.")
+            return
         players = load_json(players_file)
         word = get_category_word(text)
+        if word is None:
+            update.message.reply_text("⚠️ In dieser Kategorie sind keine Wörter mehr übrig. Bitte andere wählen.")
+            return
         imposter = random.choice(players)
         random.shuffle(players)
 
@@ -201,6 +213,7 @@ dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(CommandHandler("join", join))
 dispatcher.add_handler(CommandHandler("startgame", startgame))
 dispatcher.add_handler(CommandHandler("vote", vote))
+dispatcher.add_handler(CommandHandler("kategorien", kategorien))
 dispatcher.add_handler(MessageHandler(Filters.text, handle_all_messages))
 dispatcher.add_handler(MessageHandler(Filters.text & Filters.command, handle_vote))
 
