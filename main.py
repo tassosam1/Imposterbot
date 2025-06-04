@@ -1,59 +1,26 @@
 import os
 import json
 import random
-from telegram import Update, Bot
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from flask import Flask, request
+from telegram import Bot, Update
+from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters, CallbackContext
 
 TOKEN = os.environ['TELEGRAM_TOKEN']
+URL = os.environ.get('RENDER_EXTERNAL_URL')  # Render setzt diese automatisch
 bot = Bot(TOKEN)
-updater = Updater(TOKEN, use_context=True)
-dispatcher = updater.dispatcher
+
+app = Flask(__name__)
+dispatcher = Dispatcher(bot, None, use_context=True)
 
 # -------------------- Wortlisten --------------------
 categories = {
     "alles": [],
-    "tiere": [
-        "Hund", "Katze", "Maus", "Fisch", "Adler", "Esel", "Pferd", "Löwe", "Elefant", "Schlange",
-        "Tiger", "Panther", "Wal", "Hai", "Zebra", "Giraffe", "Frosch", "Kröte", "Huhn", "Kuh",
-        "Schaf", "Geiß", "Igel", "Fuchs", "Dachs", "Marder", "Schwein", "Hirsch", "Reh", "Ameise",
-        "Biene", "Wespe", "Hornisse", "Spinne", "Krebs", "Qualle", "Seestern", "Tintenfisch", "Robbe", "Delphin",
-        "Papagei", "Taube", "Kanarienvogel", "Pfau", "Strauß", "Flamingo", "Waschbär", "Murmel", "Wiesel", "Otter"
-    ],
-    "essen": [
-        "Pizza", "Burger", "Salat", "Banane", "Currywurst", "Suppe", "Spaghetti", "Döner", "Apfel", "Käse",
-        "Toast", "Croissant", "Schnitzel", "Bockwurst", "Ravioli", "Chili", "Pfannkuchen", "Brot", "Reis", "Couscous",
-        "Steak", "Torte", "Kuchen", "Eis", "Pudding", "Joghurt", "Müsli", "Cornflakes", "Milch", "Wasser",
-        "Saft", "Smoothie", "Kaffee", "Tee", "Cola", "Fanta", "Pommes", "Chips", "Kekse", "Gummibärchen",
-        "Schokolade", "Lakritz", "Zuckerwatte", "Creme", "Lasagne", "Wrap", "Sushi", "Tofu", "Falafel", "Kichererbse"
-    ],
-    "spicy": [
-        "Stripclub", "Kondom", "Exfreundin", "Porno", "Seitensprung", "Handschellen", "One Night Stand",
-        "Affäre", "Erotik", "Lust", "Nackt", "Dessous", "Sexspielzeug", "Dirty Talk", "Blindfold", "Massageöl", "Gleitgel", "Latex", "Peitsche", "Fessel",
-        "Intimrasur", "Tinder", "Sexdate", "Fetisch", "Lover", "Quickie", "One-Night-Stand", "Hintern", "Brüste", "Lustobjekt",
-        "Dominanz", "Unterwerfung", "Nippel", "Kamasutra", "Stöhn", "Sexting", "Pornosite", "Webcam", "Camgirl", "Callboy",
-        "Sexfilm", "Oralsex", "Dirty Pics", "Pikant", "Verführer", "Reizwäsche", "Nylon", "Korsett", "BDSM", "Stöckelschuh"
-    ],
-    "arbeit": [
-        "Chef", "Laptop", "Schreibtisch", "Büro", "Kaffeepause", "Meeting", "Deadline",
-        "Protokoll", "Vertrag", "Drucker", "E-Mail", "Telefon", "Kollege", "Projekt", "Leitung", "Pause", "Urlaub", "Homeoffice", "Zeiterfassung", "Mitarbeiter",
-        "Gehaltsabrechnung", "Lohn", "Team", "Arbeitsplatz", "Anruf", "Besprechung", "Kantine", "Auftrag", "Excel", "PowerPoint",
-        "Chefsekretär", "Mitarbeiterin", "Projektmanager", "Kopierer", "Scanner", "Server", "Ablage", "Bewerbung", "Stellenanzeige", "Stempeluhr",
-        "Pendler", "Vertrieb", "Kundengespräch", "Meetingraum", "Whiteboard", "Mitarbeitergespräch", "Chefetage", "Firmenausweis", "Personalakte", "Zeugnis"
-    ],
-    "gegenstände": [
-        "Lampe", "Tisch", "Rucksack", "Glas", "Handy", "Stuhl", "Regenschirm", "Schere",
-        "Messer", "Gabel", "Löffel", "Teller", "Becher", "Fernbedienung", "Wecker", "Kamera", "Schrank", "Spiegel", "Kissen",
-        "Decke", "Stift", "Block", "Heft", "Taschenlampe", "Feuerzeug", "Flasche", "Zahnbürste", "Seife", "Badeente",
-        "Kamm", "Bügeleisen", "Staubsauger", "Laptop", "Monitor", "Tastatur", "Maus", "Ladegerät", "Kabel", "Schraubenzieher",
-        "Hammer", "Nagel", "Bohrer", "Besen", "Schwamm", "Waschmittel", "Mülleimer", "Kerze", "Batterie", "Uhr"
-    ],
-    "hobbies": [
-        "Lesen", "Schwimmen", "Gitarre", "Gaming", "Malen", "Fotografieren", "Backen",
-        "Kochen", "Wandern", "Joggen", "Fahrradfahren", "Skaten", "Basteln", "Gärtnern", "Reiten", "Schreiben", "Zeichnen", "Origami", "Tanzen",
-        "Singen", "Musik machen", "Stricken", "Häkeln", "Angeln", "Klettern", "Yoga", "Meditieren", "Schach", "Brettspiele",
-        "Videospiele", "Filme schauen", "Serien schauen", "Bloggen", "Podcasten", "Heimwerken", "Modellbau", "Astronomie", "Vögel beobachten", "Kochvideos drehen",
-        "Cocktails mixen", "Instrumente spielen", "Improtheater", "Kunst machen", "Sprachen lernen", "Leserunden", "Zaubern", "Speedcubing", "Parkour", "Slacklinen"
-    ]
+    "tiere": [ ... ],
+    "essen": [ ... ],
+    "spicy": [ ... ],
+    "arbeit": [ ... ],
+    "gegenstände": [ ... ],
+    "hobbies": [ ... ]
 }
 
 for k, lst in categories.items():
@@ -124,9 +91,7 @@ def handle_all_messages(update: Update, context: CallbackContext):
 
     awaiting = context.bot_data.get('awaiting')
 
-    # Kategorieeingabe
     if awaiting == 'category':
-        print(f"[Kategorie gewählt] {text}")
         if text not in categories:
             update.message.reply_text("❌ Unbekannte Kategorie. Versuch es erneut.")
             return
@@ -164,7 +129,6 @@ def handle_all_messages(update: Update, context: CallbackContext):
         update.message.reply_text(msg + "\n➡️ Bitte in dieser Reihenfolge eine Nachricht im Gruppenchat schreiben.")
         return
 
-    # Neustart
     if awaiting == 'restart':
         if text == 'ja':
             reset_game()
@@ -174,7 +138,6 @@ def handle_all_messages(update: Update, context: CallbackContext):
         context.bot_data['awaiting'] = None
         return
 
-    # Wortüberprüfung
     state = load_json(game_state_file)
     if state and 'word' in state:
         word = state['word'].lower()
@@ -217,5 +180,16 @@ dispatcher.add_handler(CommandHandler("kategorien", kategorien))
 dispatcher.add_handler(MessageHandler(Filters.text, handle_all_messages))
 dispatcher.add_handler(MessageHandler(Filters.text & Filters.command, handle_vote))
 
-updater.start_polling()
-updater.idle()
+@app.route(f"/{TOKEN}", methods=['POST'])
+def webhook():
+    update = Update.de_json(request.get_json(force=True), bot)
+    dispatcher.process_update(update)
+    return 'ok'
+
+@app.route('/')
+def index():
+    return 'Bot is running!'
+
+if __name__ == '__main__':
+    bot.set_webhook(f"{URL}/{TOKEN}")
+    app.run(host='0.0.0.0", port=int(os.environ.get('PORT', 5000)))
