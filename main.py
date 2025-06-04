@@ -80,8 +80,8 @@ def join(update: Update, context: CallbackContext):
 
 def startgame(update: Update, context: CallbackContext):
     players = load_json(players_file)
-    if len(players) < 3:
-        update.message.reply_text("❗ Mindestens 3 Spieler:innen nötig.")
+    if len(players) < 2:
+        update.message.reply_text("❗ Mindestens 2 Spieler:innen nötig.")
         return
     set_bot_state('awaiting', 'trigger')
     update.message.reply_text("🕹️ Schreibe irgendwas, um ein Wort auszuwählen und das Spiel zu starten.")
