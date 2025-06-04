@@ -14,13 +14,49 @@ dispatcher = Dispatcher(bot, None, use_context=True)
 
 # -------------------- Wortlisten --------------------
 categories = {
-    "alles": [],
-    "tiere": [ ... ],
-    "essen": [ ... ],
-    "spicy": [ ... ],
-    "arbeit": [ ... ],
-    "gegenstände": [ ... ],
-    "hobbies": [ ... ]
+    "alles": [],  # wird automatisch befüllt
+    "tiere": [
+        "hund", "katze", "löwe", "tiger", "bär", "affe", "pferd", "maus", "elefant", "giraffe",
+        "schwein", "huhn", "ente", "eule", "delfin", "fuchs", "wolf", "kaninchen", "schildkröte", "krokodil",
+        "ziege", "schaf", "hase", "pinguin", "wal", "krabbe", "hai", "adler", "papagei", "specht",
+        "pferd", "meerschweinchen", "ameise", "biene", "käfer", "schlange", "echse", "frosch", "storch", "sträuß",
+        "waschbär", "marder", "alpaka", "lama", "otter", "wiesel", "gepard", "panther", "pfau", "molch"
+    ],
+    "essen": [
+        "pizza", "burger", "nudeln", "sushi", "reis", "kartoffeln", "brötchen", "toast", "kuchen", "schokolade",
+        "keks", "banane", "apfel", "birne", "erdbeere", "schinken", "käse", "wurst", "lachs", "steak",
+        "hähnchen", "pommes", "salat", "müsli", "joghurt", "milch", "quark", "honig", "marmelade", "brot",
+        "wrap", "taco", "lasagne", "suppe", "gulasch", "curry", "chips", "donut", "pudding", "tomate",
+        "gurke", "zwiebel", "knoblauch", "paprika", "mais", "avocado", "kakao", "cola", "saft", "eis"
+    ],
+    "spicy": [
+        "stripclub", "alkohol", "nackt", "affäre", "kondom", "orgasmus", "sex", "porno", "unterwäsche", "lust",
+        "knutschen", "fetisch", "flirt", "escort", "kater", "joint", "katerfrühstück", "spielzeug", "dirty talk", "kneipe",
+        "dates", "one night stand", "handcuffs", "liebesbrief", "whatsapp", "flachgelegt", "nacktbilder", "massageöl", "sexting", "verführung",
+        "balkon", "quickie", "geheimnis", "schlüpfer", "gleitmittel", "hängematte", "urlaubsliebe", "pick-up", "bar", "hotel",
+        "schnaps", "bier", "cocktail", "stripper", "spiegel", "handschellen", "nachttisch", "zimmer", "nippel", "leder"
+    ],
+    "arbeit": [
+        "meeting", "chef", "büro", "lohn", "vertrag", "pause", "drucker", "kaffee", "projekt", "maus",
+        "email", "notebook", "deadline", "besprechung", "stift", "praktikum", "bewerbung", "urlaub", "stress", "kollege",
+        "leiter", "druck", "papier", "ablage", "arbeitszeit", "stempel", "pause", "kopierer", "arbeitsvertrag", "lohnabrechnung",
+        "team", "zoom", "anruf", "storno", "dienstreise", "tagesordnung", "aufgabe", "ziel", "vorgesetzter", "feedback",
+        "planung", "arbeitsplatz", "open space", "co-working", "whiteboard", "leiterin", "umsatz", "bericht", "kalkulation", "excel"
+    ],
+    "gegenstände": [
+        "tasse", "buch", "stuhl", "tisch", "lampe", "schlüssel", "messer", "brille", "telefon", "handy",
+        "rucksack", "schirm", "heft", "kugelschreiber", "akku", "ladekabel", "bildschirm", "maus", "fernseher", "box",
+        "kissen", "matratze", "uhr", "kamera", "fahrrad", "helm", "jacke", "schuh", "socke", "hose",
+        "tür", "fenster", "batterie", "seife", "zahnbürste", "shampoo", "schere", "kerze", "feuerzeug", "decke",
+        "mikrofon", "waschmaschine", "ventilator", "rucksack", "lupe", "lineal", "notizblock", "ordner", "drucker", "radio"
+    ],
+    "hobbies": [
+        "lesen", "zeichnen", "kochen", "tanzen", "singen", "gärtnern", "schwimmen", "joggen", "radfahren", "fotografieren",
+        "schreiben", "backen", "spielen", "reisen", "nähen", "stricken", "basteln", "filme", "serien", "angeln",
+        "reiten", "schach", "yoga", "klettern", "wandern", "campen", "gamen", "gitarre", "piano", "zeichnen",
+        "skaten", "basketball", "fußball", "geocaching", "puzzeln", "kartenspiele", "imkern", "segeln", "tauchen", "surfen",
+        "modellbau", "magie", "drohnen", "videodreh", "tik-tok", "podcast", "schreiben", "karaoke", "autotuning", "spazieren"
+    ]
 }
 
 for k, lst in categories.items():
