@@ -55,6 +55,7 @@ categories = {
         "Cocktails mixen", "Instrumente spielen", "Improtheater", "Kunst machen", "Sprachen lernen", "Leserunden", "Zaubern", "Speedcubing", "Parkour", "Slacklinen"
     ]
 }
+
 for k, lst in categories.items():
     if k != "alles":
         categories["alles"].extend(lst)
@@ -109,20 +110,22 @@ def startgame(update: Update, context: CallbackContext):
     if len(players) < 3:
         update.message.reply_text("❗ Mindestens 3 Spieler:innen nötig.")
         return
-
     update.message.reply_text("Bitte gib eine Kategorie ein (z.B. tiere, essen, spicy, arbeit, gegenstände, hobbies, alles):")
-    context.bot_data['awaiting_category'] = True
+    context.bot_data['awaiting'] = 'category'
 
-# nach Kategorieauswahl
+def handle_all_messages(update: Update, context: CallbackContext):
+    text = update.message.text.strip().lower()
+    user_id = update.effective_user.id
 
-def handle_category_choice(update: Update, context: CallbackContext):
-    if context.bot_data.get('awaiting_category'):
-        cat = update.message.text.lower()
-        if cat not in categories:
+    awaiting = context.bot_data.get('awaiting')
+
+    # Kategorieeingabe
+    if awaiting == 'category':
+        if text not in categories:
             update.message.reply_text("❌ Unbekannte Kategorie. Versuch es erneut.")
             return
         players = load_json(players_file)
-        word = get_category_word(cat)
+        word = get_category_word(text)
         imposter = random.choice(players)
         random.shuffle(players)
 
@@ -137,7 +140,7 @@ def handle_category_choice(update: Update, context: CallbackContext):
 
         save_json(game_state_file, {"word": word, "imposter": imposter})
         save_json(chat_order_file, players)
-        context.bot_data['awaiting_category'] = False
+        context.bot_data['awaiting'] = None
 
         msg = "💬 Schreibreihenfolge:\n"
         for i, uid in enumerate(players):
@@ -147,36 +150,30 @@ def handle_category_choice(update: Update, context: CallbackContext):
             except:
                 continue
         update.message.reply_text(msg + "\n➡️ Bitte in dieser Reihenfolge eine Nachricht im Gruppenchat schreiben.")
-
-# Überwacht Nachrichten für das geheime Wort
-
-def monitor_messages(update: Update, context: CallbackContext):
-    state = load_json(game_state_file)
-    if not state:
         return
-    word = state['word'].lower()
-    if word in update.message.text.lower():
-        update.message.reply_text("💥 IMPOSTER GEWONNEN!")
-        update.message.reply_text("🔁 Neue Runde starten? Antworte mit 'ja' oder 'nein'")
-        context.bot_data['await_restart'] = True
 
-# Neustart bei Zustimmung
-
-def handle_restart(update: Update, context: CallbackContext):
-    if context.bot_data.get('await_restart'):
-        if update.message.text.lower() == 'ja':
+    # Neustart
+    if awaiting == 'restart':
+        if text == 'ja':
             reset_game()
             update.message.reply_text("🆕 Neue Runde: Alle bitte /join tippen!")
-        elif update.message.text.lower() == 'nein':
+        elif text == 'nein':
             update.message.reply_text("🛑 Spiel beendet.")
-        context.bot_data['await_restart'] = False
+        context.bot_data['awaiting'] = None
+        return
 
-# Abstimmung starten
+    # Wortüberprüfung
+    state = load_json(game_state_file)
+    if state and 'word' in state:
+        word = state['word'].lower()
+        if word in text:
+            update.message.reply_text("💥 IMPOSTER GEWONNEN!")
+            update.message.reply_text("🔁 Neue Runde starten? Antworte mit 'ja' oder 'nein'")
+            context.bot_data['awaiting'] = 'restart'
+            return
 
 def vote(update: Update, context: CallbackContext):
-    update.message.reply_text("✉️ Bitte stimme anonym ab: /vote <@username>")
-
-# Stimme speichern
+    update.message.reply_text("✉️ Bitte stimme anonym ab: /vote @username")
 
 def handle_vote(update: Update, context: CallbackContext):
     text = update.message.text.strip()
@@ -197,16 +194,14 @@ def handle_vote(update: Update, context: CallbackContext):
         winner = "CREWMATES" if votes.count(imposter) > len(players) // 2 else "IMPOSTER"
         update.message.reply_text(f"🏆 {winner} GEWINNT!")
         update.message.reply_text("🔁 Neue Runde starten? 'ja' oder 'nein'")
-        context.bot_data['await_restart'] = True
+        context.bot_data['awaiting'] = 'restart'
 
 # -------------------- Dispatcher --------------------
 dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(CommandHandler("join", join))
 dispatcher.add_handler(CommandHandler("startgame", startgame))
 dispatcher.add_handler(CommandHandler("vote", vote))
-dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_category_choice))
-dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, monitor_messages))
-dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_restart))
+dispatcher.add_handler(MessageHandler(Filters.text, handle_all_messages))
 dispatcher.add_handler(MessageHandler(Filters.text & Filters.command, handle_vote))
 
 updater.start_polling()
