@@ -1,9 +1,11 @@
 services:
-  - type: worker
+  - type: web
     name: imposter-bot
-    env: python
-    buildCommand: ""
-    startCommand: bash start.sh
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
     envVars:
       - key: TELEGRAM_TOKEN
-        value: YOUR_TELEGRAM_BOT_TOKEN_HERE
+        value: 7937109669:AAGfK5QxLs1txa0sTk-SLKGmOqHWTWXLlfE
+    plan: free
+    region: frankfurt
