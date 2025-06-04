@@ -8,7 +8,11 @@ app = Flask(name) dispatcher = Dispatcher(bot, None, use_context=True)
 
 -------------------- Wortliste (vereint) -------------------- 
 
-all_words = [ "hund", "katze", "löwe", "pizza", "burger", "sushi", "stripclub", "kondom", "orgasmus", "meeting", "chef", "drucker", "tasse", "stuhl", "tisch", "lesen", "zeichnen", "tanzen", "kamera", "bier", "cocktail", "urlaub", "hobby", "projekt", "telefon", "kaffee", "schokolade" ]
+all_words = [ # 🍕 Essen "pizza", "burger", "sushi", "nudeln", "reis", "kartoffeln", "kuchen", "schokolade", "banane", "apfel", "birne", "erdbeere", "käse", "wurst", "lachs", "steak", "hähnchen", "salat", "wrap", "taco",
+
+# 🔥 Spicy "stripclub", "kondom", "orgasmus", "sex", "porno", "lust", "knutschen", "fetisch", "escort", "spielzeug", "dirty talk", "nackt", "one night stand", "quickie", "verführung", "handschellen", "leder", "nachttisch", "schnaps", "cocktail", # 🧠 Hobbies "lesen", "zeichnen", "tanzen", "singen", "gärtnern", "schwimmen", "joggen", "radfahren", "fotografieren", "kochen", "backen", "reisen", "stricken", "basteln", "filme", "serien", "angeln", "reiten", "schach", "yoga", # 📦 Gegenstände "tasse", "stuhl", "tisch", "lampe", "schlüssel", "messer", "brille", "telefon", "rucksack", "schirm", "heft", "stift", "akku", "ladekabel", "bildschirm", "maus", "fernseher", "kissen", "matratze", "uhr" 
+
+]
 
 -------------------- Datei-Pfade -------------------- 
 
