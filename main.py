@@ -112,8 +112,8 @@ def join(update: Update, context: CallbackContext):
 
 def startgame(update: Update, context: CallbackContext):
     players = load_json(players_file)
-    if len(players) < 3:
-        update.message.reply_text("❗ Mindestens 3 Spieler:innen nötig.")
+    if len(players) < 2:
+        update.message.reply_text("❗ Mindestens 2 Spieler:innen nötig.")
         return
     update.message.reply_text("Bitte gib eine Kategorie ein (z.B. tiere, essen, spicy, arbeit, gegenstände, hobbies, alles):")
     context.bot_data['awaiting'] = 'category'
