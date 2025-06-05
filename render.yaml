@@ -3,9 +3,11 @@ services:
     name: imposter-bot
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python main.py
+    startCommand: bash start.sh
     envVars:
       - key: TELEGRAM_TOKEN
-        value: 7937109669:AAGfK5QxLs1txa0sTk-SLKGmOqHWTWXLlfE
+        value: <DEIN_TOKEN_HIER>
+      - key: RENDER_EXTERNAL_URL
+        value: <DEINE_URL_HIER>
     plan: free
     region: frankfurt
