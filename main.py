@@ -92,7 +92,7 @@ def join(update: Update, context: CallbackContext):
 def spieler(update: Update, context: CallbackContext):
     players = load_json(players_file)
     if not players:
-        update.message.reply_text("👥 Noch keine Spieler dabei.")
+        update.message.reply_text("👥 Es haben sich noch keine Spieler angemeldet.")
         return
     namen = []
     for uid in players:
@@ -101,9 +101,9 @@ def spieler(update: Update, context: CallbackContext):
             namen.append(user.first_name)
         except:
             namen.append(str(uid))
-    update.message.reply_text("👥 Spieler:
-" + "\n".join(namen))
-
+    text = "👥 Aktuelle Spieler:\n" + "\n".join(namen)
+    update.message.reply_text(text)
+    
 def startgame(update: Update, context: CallbackContext):
     players = load_json(players_file)
     if len(players) < 2:
