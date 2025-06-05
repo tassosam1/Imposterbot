@@ -1,8 +1,3 @@
-### Imposter Bot: Vollständiger Code (Telegram + Flask)
-
-#### 📁 Datei: `main.py`
-
-```python
 import os
 import json
 import random
